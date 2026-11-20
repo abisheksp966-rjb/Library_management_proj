@@ -1,0 +1,28 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints
+
+# Java Compilation
+*.class
+bin/
+*.jar
+*.war
+*.ear
+
+# Operating System Files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store
+
+# IDE Configurations
+.idea/
+*.iml
+.vscode/
+.classpath
+.project
+.settings/

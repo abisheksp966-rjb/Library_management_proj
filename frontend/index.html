@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Circulation & Usage Analysis System | VCET IT</title>
+    <!-- Google Fonts & FontAwesome -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js for live analytical visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Top College Brand Banner -->
+    <header class="top-header">
+        <div class="header-container">
+            <div class="institution-branding">
+                <i class="fa-solid fa-graduation-cap header-logo-icon"></i>
+                <div>
+                    <h1>VELALAR COLLEGE OF ENGINEERING AND TECHNOLOGY</h1>
+                    <p class="sub-title">Autonomous Institution </p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Navigation Bar -->
+    <nav class="nav-bar">
+        <div class="nav-container">
+            <div class="system-title">
+                <i class="fa-solid fa-book-bookmark"></i>
+                <span>Library Circulation & Usage Analysis</span>
+            </div>
+            <ul class="nav-tabs">
+                <li class="tab-item active" data-tab="dashboard"><i class="fa-solid fa-chart-line"></i> Dashboard</li>
+                <li class="tab-item" data-tab="catalog"><i class="fa-solid fa-book"></i> Book Catalog</li>
+                <li class="tab-item" data-tab="issue"><i class="fa-solid fa-arrow-up-from-bracket"></i> Issue Book</li>
+                <li class="tab-item" data-tab="return"><i class="fa-solid fa-arrow-right-to-bracket"></i> Return Book</li>
+                <li class="tab-item" data-tab="overdue"><i class="fa-solid fa-clock-rotate-left"></i> Overdue & Fines</li>
+                <li class="tab-item" data-tab="students"><i class="fa-solid fa-users"></i> Students</li>
+                <li class="tab-item" data-tab="analytics"><i class="fa-solid fa-chart-pie"></i> Usage Analytics</li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Notification Toast Container -->
+    <div id="toast" class="toast hidden"></div>
+
+    <!-- Main Application Container -->
+    <main class="main-container">
+
+        <!-- ============================================================= -->
+        <!-- TAB 1: DASHBOARD -->
+        <!-- ============================================================= -->
+        <section id="tab-dashboard" class="tab-content active">
+            <div class="section-header">
+                <div>
+                    <h2>Circulation Operations Overview</h2>
+                    <p class="section-desc">Real-time statistics synchronized directly with SQLite Database (<code>library.db</code>)</p>
+                </div>
+                <div class="quick-actions">
+                    <button class="btn btn-primary" onclick="switchTab('issue')"><i class="fa-solid fa-plus"></i> New Issue</button>
+                    <button class="btn btn-success" onclick="switchTab('return')"><i class="fa-solid fa-undo"></i> Process Return</button>
+                    <button class="btn btn-secondary" onclick="refreshDashboard()"><i class="fa-solid fa-rotate"></i> Refresh</button>
+                </div>
+            </div>
+
+            <!-- KPI Metric Cards Grid -->
+            <div class="kpi-grid">
+                <div class="kpi-card card-blue">
+                    <div class="kpi-icon"><i class="fa-solid fa-book-open"></i></div>
+                    <div class="kpi-data">
+                        <span class="kpi-label">Total Titles</span>
+                        <h3 id="stat-total-books">-</h3>
+                        <span class="kpi-meta" id="stat-available-copies">- Physical Copies</span>
+                    </div>
+                </div>
+
+                <div class="kpi-card card-green">
+                    <div class="kpi-icon"><i class="fa-solid fa-hand-holding-hand"></i></div>
+                    <div class="kpi-data">
+                        <span class="kpi-label">Active Loans</span>
+                        <h3 id="stat-active-loans">-</h3>
+                        <span class="kpi-meta">Currently with Students</span>
+                    </div>
+                </div>
+
+                <div class="kpi-card card-amber">
+                    <div class="kpi-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                    <div class="kpi-data">
+                        <span class="kpi-label">Overdue Loans</span>
+                        <h3 id="stat-overdue-loans">-</h3>
+                        <span class="kpi-meta">Past 14-day limit</span>
+                    </div>
+                </div>
+
+                <div class="kpi-card card-purple">
+                    <div class="kpi-icon"><i class="fa-solid fa-indian-rupee-sign"></i></div>
+                    <div class="kpi-data">
+                        <span class="kpi-label">Fines Collected</span>
+                        <h3 id="stat-total-fines">₹0.00</h3>
+                        <span class="kpi-meta">Rule: ₹2.00 / day overdue</span>
+                    </div>
+                </div>
+
+                <div class="kpi-card card-teal">
+                    <div class="kpi-icon"><i class="fa-solid fa-user-graduate"></i></div>
+                    <div class="kpi-data">
+                        <span class="kpi-label">Registered Members</span>
+                        <h3 id="stat-total-students">-</h3>
+                        <span class="kpi-meta">Max 3 books per student</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Business Rules Notification Box -->
+            <div class="rules-callout">
+                <div class="callout-icon"><i class="fa-solid fa-shield-halved"></i></div>
+                <div class="callout-text">
+                    <strong>Enforced Business Rules (Scenario 4):</strong>
+                    <span>1. Standard Loan Duration = <strong>14 Days</strong>.</span>
+                    <span>2. Maximum Active Books Allowed = <strong>3 Books per student</strong>.</span>
+                    <span>3. Overdue Penalty Rate = <strong>₹2.00 / day</strong>.</span>
+                    <span>4. Zero-stock books are locked from issuance automatically.</span>
+                </div>
+            </div>
+
+            <!-- Recent Circulation Activity Table -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h3><i class="fa-solid fa-list-check"></i> Recent Circulation Transactions</h3>
+                    <span class="badge badge-info" id="tx-badge-count">Showing latest</span>
+                </div>
+                <div class="table-responsive">
+                    <table class="data-table" id="recent-transactions-table">
+                        <thead>
+                            <tr>
+                                <th>TX ID</th>
+                                <th>Student</th>
+                                <th>Book Title</th>
+                                <th>Category</th>
+                                <th>Issue Date</th>
+                                <th>Due Date</th>
+                                <th>Status</th>
+                                <th>Fine Paid</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recent-transactions-body">
+                            <tr><td colspan="8" class="text-center">Loading transactions from backend...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================================= -->
+        <!-- TAB 2: BOOK CATALOG -->
+        <!-- ============================================================= -->
+        <section id="tab-catalog" class="tab-content">
+            <div class="section-header">
+                <div>
+                    <h2>Book Catalog & Inventory</h2>
+                    <p class="section-desc">Search, filter, and inspect physical stock status in real-time.</p>
+                </div>
+                <button class="btn btn-primary" onclick="openAddBookModal()"><i class="fa-solid fa-plus"></i> Add New Book</button>
+            </div>
+
+            <div class="filter-bar">
+                <div class="search-input-group">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="catalog-search" placeholder="Search by title, ISBN, or author..." oninput="filterBooks()">
+                </div>
+                <select id="category-filter" onchange="filterBooks()">
+                    <option value="">All Subject Categories</option>
+                </select>
+                <select id="availability-filter" onchange="filterBooks()">
+                    <option value="all">All Statuses</option>
+                    <option value="available">In Stock Only</option>
+                    <option value="unavailable">Out of Stock</option>
+                </select>
+            </div>
+
+            <div class="panel">
+                <div class="table-responsive">
+                    <table class="data-table" id="books-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>ISBN</th>
+                                <th>Title</th>
+                                <th>Author</th>
+                                <th>Category</th>
+                                <th>Stock (Avail / Total)</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="books-table-body">
+                            <tr><td colspan="8" class="text-center">Loading catalog...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================================= -->
+        <!-- TAB 3: ISSUE BOOK -->
+        <!-- ============================================================= -->
+        <section id="tab-issue" class="tab-content">
+            <div class="section-header">
+                <div>
+                    <h2>Book Circulation Issue Portal</h2>
+                    <p class="section-desc">Allocate available books to eligible registered students.</p>
+                </div>
+            </div>
+
+            <div class="form-grid-layout">
+                <div class="card form-card">
+                    <div class="form-card-header">
+                        <h3><i class="fa-solid fa-receipt"></i> Issue Form</h3>
+                    </div>
+                    <form id="issue-book-form" onsubmit="submitIssueBook(event)">
+                        <div class="form-group">
+                            <label for="issue-student-select">Select Student Borrower: <span class="required">*</span></label>
+                            <select id="issue-student-select" required onchange="onStudentSelectChange()">
+                                <option value="">-- Choose Student --</option>
+                            </select>
+                            <small class="form-hint" id="student-borrow-status">Select a student to inspect borrow limits</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="issue-book-select">Select Book to Issue: <span class="required">*</span></label>
+                            <select id="issue-book-select" required onchange="onBookSelectChange()">
+                                <option value="">-- Choose Book --</option>
+                            </select>
+                            <small class="form-hint" id="book-stock-status">Select a book to inspect current availability</small>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group col-6">
+                                <label for="issue-date">Issue Date:</label>
+                                <input type="date" id="issue-date" required onchange="calculateDueDatePreview()">
+                            </div>
+                            <div class="form-group col-6">
+                                <label for="due-date-preview">Calculated Due Date (14 Days):</label>
+                                <input type="text" id="due-date-preview" readonly class="input-readonly">
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary" id="btn-issue-submit">
+                                <i class="fa-solid fa-check"></i> Confirm & Issue Book
+                            </button>
+                            <button type="reset" class="btn btn-secondary">Reset Form</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Guidance & Policy Card -->
+                <div class="card info-card">
+                    <h3><i class="fa-solid fa-circle-info"></i> Circulation Policy Check</h3>
+                    <ul class="policy-checklist">
+                        <li><i class="fa-solid fa-circle-check text-green"></i> <strong>Zero-Copy Block:</strong> System automatically locks books where Available Copies = 0.</li>
+                        <li><i class="fa-solid fa-circle-check text-green"></i> <strong>Limit Enforcement:</strong> Students with 3 active loans are blocked until they return an item.</li>
+                        <li><i class="fa-solid fa-circle-check text-green"></i> <strong>Duplicate Title Prevention:</strong> A student cannot borrow a second copy of an already held title.</li>
+                        <li><i class="fa-solid fa-calendar-days text-blue"></i> <strong>Loan Period:</strong> 14 days calendar allowance.</li>
+                    </ul>
+
+                    <div id="issue-receipt-box" class="receipt-box hidden">
+                        <h4><i class="fa-solid fa-ticket"></i> Last Issued Slip</h4>
+                        <div id="issue-receipt-content"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================================= -->
+        <!-- TAB 4: RETURN BOOK -->
+        <!-- ============================================================= -->
+        <section id="tab-return" class="tab-content">
+            <div class="section-header">
+                <div>
+                    <h2>Book Return & Fine Processing Portal</h2>
+                    <p class="section-desc">Receive returned items, update inventory, and compute overdue penalties.</p>
+                </div>
+            </div>
+
+            <div class="form-grid-layout">
+                <div class="card form-card">
+                    <div class="form-card-header">
+                        <h3><i class="fa-solid fa-rotate-left"></i> Process Return</h3>
+                    </div>
+                    <form id="return-book-form" onsubmit="submitReturnBook(event)">
+                        <div class="form-group">
+                            <label for="return-tx-select">Select Active Transaction to Return: <span class="required">*</span></label>
+                            <select id="return-tx-select" required onchange="onReturnTxChange()">
+                                <option value="">-- Choose Active Loan --</option>
+                            </select>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group col-6">
+                                <label for="return-date">Return Date: <span class="required">*</span></label>
+                                <input type="date" id="return-date" required onchange="recalcReturnFinePreview()">
+                            </div>
+                            <div class="form-group col-6">
+                                <label>Due Date Reference:</label>
+                                <input type="text" id="return-due-date-preview" readonly class="input-readonly" value="-">
+                            </div>
+                        </div>
+
+                        <!-- Live Fine Preview Banner -->
+                        <div id="fine-preview-banner" class="fine-banner banner-neutral">
+                            <div class="fine-title">Overdue Fine Calculation</div>
+                            <div class="fine-amount" id="preview-fine-amount">₹0.00</div>
+                            <div class="fine-details" id="preview-fine-details">Select a transaction to calculate fine</div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-success" id="btn-return-submit">
+                                <i class="fa-solid fa-check-double"></i> Complete Return & Collect Fine
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="card info-card">
+                    <h3><i class="fa-solid fa-calculator"></i> Fine Computation Formula</h3>
+                    <div class="formula-box">
+                        <p><strong>Overdue Days</strong> = Max(0, Return Date − Due Date)</p>
+                        <p><strong>Fine Amount</strong> = Overdue Days × ₹2.00</p>
+                    </div>
+                    <div id="return-receipt-box" class="receipt-box hidden">
+                        <h4><i class="fa-solid fa-receipt"></i> Return Clearance Receipt</h4>
+                        <div id="return-receipt-content"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================================= -->
+        <!-- TAB 5: OVERDUE TRACKER -->
+        <!-- ============================================================= -->
+        <section id="tab-overdue" class="tab-content">
+            <div class="section-header">
+                <div>
+                    <h2>Overdue Loans & Fine Recovery</h2>
+                    <p class="section-desc">Active borrowings currently exceeding the 14-day borrowing threshold.</p>
+                </div>
+                <button class="btn btn-secondary" onclick="loadOverdueLoans()"><i class="fa-solid fa-rotate"></i> Recompute Fines</button>
+            </div>
+
+            <div class="panel">
+                <div class="table-responsive">
+                    <table class="data-table" id="overdue-table">
+                        <thead>
+                            <tr>
+                                <th>TX ID</th>
+                                <th>Student Reg No</th>
+                                <th>Student Name</th>
+                                <th>Book Title</th>
+                                <th>Category</th>
+                                <th>Due Date</th>
+                                <th>Days Overdue</th>
+                                <th>Accrued Fine (₹)</th>
+                                <th>Quick Return</th>
+                            </tr>
+                        </thead>
+                        <tbody id="overdue-table-body">
+                            <tr><td colspan="9" class="text-center">Checking overdue records...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================================= -->
+        <!-- TAB 6: STUDENTS -->
+        <!-- ============================================================= -->
+        <section id="tab-students" class="tab-content">
+            <div class="section-header">
+                <div>
+                    <h2>Registered Student Members</h2>
+                    <p class="section-desc">Manage student membership and track individual borrowing histories.</p>
+                </div>
+                <button class="btn btn-primary" onclick="openAddStudentModal()"><i class="fa-solid fa-user-plus"></i> Register Student</button>
+            </div>
+
+            <div class="panel">
+                <div class="table-responsive">
+                    <table class="data-table" id="students-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Register No</th>
+                                <th>Name</th>
+                                <th>Department</th>
+                                <th>Year</th>
+                                <th>Email</th>
+                                <th>Active Borrowings</th>
+                                <th>Borrowing History</th>
+                            </tr>
+                        </thead>
+                        <tbody id="students-table-body">
+                            <tr><td colspan="8" class="text-center">Loading student members...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ============================================================= -->
+        <!-- TAB 7: USAGE ANALYTICS (DATA SCIENCE) -->
+        <!-- ============================================================= -->
+        <section id="tab-analytics" class="tab-content">
+            <div class="section-header">
+                <div>
+                    <p class="section-desc">Visualizations derived from circulation logs across categories, months, books, and fine distributions.</p>
+                </div>
+                <button class="btn btn-secondary" onclick="loadAnalytics()"><i class="fa-solid fa-chart-line"></i> Re-render Charts</button>
+            </div>
+
+            <!-- Analytics Charts Grid -->
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h4><i class="fa-solid fa-chart-pie"></i> Circulation by Subject Category</h4>
+                        <span class="badge badge-info">Donut Distribution</span>
+                    </div>
+                    <div class="chart-body">
+                        <canvas id="categoryDonutChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h4><i class="fa-solid fa-chart-line"></i> Monthly Borrowing Volume & Trends (2026)</h4>
+                        <span class="badge badge-info">Time-Series</span>
+                    </div>
+                    <div class="chart-body">
+                        <canvas id="monthlyTrendChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h4><i class="fa-solid fa-ranking-star"></i> Top Most Frequently Borrowed Books</h4>
+                        <span class="badge badge-info">Ranking</span>
+                    </div>
+                    <div class="chart-body">
+                        <canvas id="topBooksChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h4><i class="fa-solid fa-money-bill-wave"></i> Cumulative Overdue Fines by Category (₹)</h4>
+                        <span class="badge badge-info">Penalty Analysis</span>
+                    </div>
+                    <div class="chart-body">
+                        <canvas id="finesCategoryChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <section class="python-analytics-panel" aria-labelledby="python-analytics-title">
+                <div class="python-analytics-header">
+                    <div>
+                        <h3 id="python-analytics-title"><i class="fa-brands fa-python"></i> Python Data Science Reports</h3>
+                        <p id="python-analytics-status" class="section-desc">Generated from the shared SQLite circulation database.</p>
+                    </div>
+                    <button class="btn btn-primary" id="btn-run-python-analytics" onclick="runPythonAnalytics()">
+                        <i class="fa-solid fa-play"></i> Run Python Analysis
+                    </button>
+                </div>
+                <div class="python-report-grid">
+                    <figure class="python-report-card">
+                        <img id="python-chart-category" src="/visualizations/category_distribution.png" alt="Book circulation distribution by category" loading="lazy">
+                        <figcaption>Category circulation</figcaption>
+                    </figure>
+                    <figure class="python-report-card">
+                        <img id="python-chart-monthly" src="/visualizations/monthly_borrowing_trends.png" alt="Monthly borrowing volume and overdue trends" loading="lazy">
+                        <figcaption>Monthly borrowing trends</figcaption>
+                    </figure>
+                    <figure class="python-report-card">
+                        <img id="python-chart-books" src="/visualizations/top_borrowed_books.png" alt="Most frequently borrowed books" loading="lazy">
+                        <figcaption>Top borrowed books</figcaption>
+                    </figure>
+                    <figure class="python-report-card">
+                        <img id="python-chart-fines" src="/visualizations/overdue_and_fine_analysis.png" alt="Overdue days and fines by category" loading="lazy">
+                        <figcaption>Overdue and fine analysis</figcaption>
+                    </figure>
+                </div>
+            </section>
+        </section>
+
+    </main>
+
+    <!-- ============================================================= -->
+    <!-- MODAL: STUDENT HISTORY -->
+    <!-- ============================================================= -->
+    <div id="student-history-modal" class="modal hidden">
+        <div class="modal-content modal-lg">
+            <div class="modal-header">
+                <h3 id="modal-student-title"><i class="fa-solid fa-clock-rotate-left"></i> Student Borrowing History</h3>
+                <span class="modal-close" onclick="closeStudentHistoryModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div id="modal-student-info" class="student-info-bar"></div>
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>TX ID</th>
+                                <th>Book Title</th>
+                                <th>Category</th>
+                                <th>Issue Date</th>
+                                <th>Due Date</th>
+                                <th>Return Date</th>
+                                <th>Status</th>
+                                <th>Fine</th>
+                            </tr>
+                        </thead>
+                        <tbody id="student-history-tbody">
+                            <tr><td colspan="8" class="text-center">Loading history...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================= -->
+    <!-- MODAL: ADD STUDENT -->
+    <!-- ============================================================= -->
+    <div id="add-student-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-user-plus"></i> Register New Student Member</h3>
+                <span class="modal-close" onclick="closeAddStudentModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="add-student-form" onsubmit="submitAddStudent(event)">
+                    <div class="form-group">
+                        <label for="new-reg-no">Register Number (e.g. 732925ITR101): <span class="required">*</span></label>
+                        <input type="text" id="new-reg-no" required placeholder="732925ITR101">
+                    </div>
+                    <div class="form-group">
+                        <label for="new-name">Full Name: <span class="required">*</span></label>
+                        <input type="text" id="new-name" required placeholder="Student Name">
+                    </div>
+                    <div class="form-group">
+                        <label for="new-dept">Department: <span class="required">*</span></label>
+                        <input type="text" id="new-dept" required value="Information Technology">
+                    </div>
+                    <div class="form-group">
+                        <label for="new-year">Year of Study: <span class="required">*</span></label>
+                        <select id="new-year" required>
+                            <option value="1">1st Year</option>
+                            <option value="2">2nd Year</option>
+                            <option value="3" selected>3rd Year</option>
+                            <option value="4">4th Year</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="new-email">College Email: <span class="required">*</span></label>
+                        <input type="email" id="new-email" required placeholder="student.25it@vcet.ac.in">
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Register Member</button>
+                        <button type="button" class="btn btn-secondary" onclick="closeAddStudentModal()">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================= -->
+    <!-- MODAL: ADD BOOK -->
+    <!-- ============================================================= -->
+    <div id="add-book-modal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-book-medical"></i> Add Book to Inventory</h3>
+                <span class="modal-close" onclick="closeAddBookModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="add-book-form" onsubmit="submitAddBook(event)">
+                    <div class="form-group">
+                        <label for="new-isbn">ISBN: <span class="required">*</span></label>
+                        <input type="text" id="new-isbn" required placeholder="978-0134685991">
+                    </div>
+                    <div class="form-group">
+                        <label for="new-title">Book Title: <span class="required">*</span></label>
+                        <input type="text" id="new-title" required placeholder="e.g. Clean Architecture">
+                    </div>
+                    <div class="form-group">
+                        <label for="new-category">Category: <span class="required">*</span></label>
+                        <select id="new-category" required>
+                            <!-- Populated dynamically -->
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="new-author">Author ID: <span class="required">*</span></label>
+                        <input type="number" id="new-author" required value="1" min="1" max="12">
+                    </div>
+                    <div class="form-group">
+                        <label for="new-copies">Total Number of Copies: <span class="required">*</span></label>
+                        <input type="number" id="new-copies" required value="5" min="1" max="50">
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Add Book</button>
+                        <button type="button" class="btn btn-secondary" onclick="closeAddBookModal()">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+    <script src="app.js"></script>
+</body>
+</html>

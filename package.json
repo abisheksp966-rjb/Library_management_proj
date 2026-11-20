@@ -1,0 +1,11 @@
+{
+  "name": "library-book-lending-and-usage-analysis-system",
+  "version": "1.0.0",
+  "description": "Scenario 4 - Library Book Lending and Usage Analysis System (VCET IT)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "author": "Abishek (732925ITR004), Class 25IT3A, VCET Erode",
+  "license": "ISC"
+}

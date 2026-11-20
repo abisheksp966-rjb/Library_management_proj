@@ -1,0 +1,179 @@
+==========================================================================================
+       VELALAR COLLEGE OF ENGINEERING AND TECHNOLOGY, ERODE - 638012
+                 DEPARTMENT OF INFORMATION TECHNOLOGY
+        ACADEMIC YEAR: 2026-2027 (ODD SEMESTER) | CLASS: 25IT3A
+   PROJECT: LIBRARY BOOK LENDING AND USAGE ANALYSIS SYSTEM (SCENARIO 4)
+   STUDENT: ABISHEK | REGISTER NO: 732925ITR004
+==========================================================================================
+[INFO] Database Mode: Memory Persistence Mode Active (SQLite JDBC Driver optional)
+
+==========================================================================================
+   MAIN NAVIGATION MENU
+==========================================================================================
+  [1]  Issue Book to Student
+  [2]  Return Book & Calculate Overdue Fine
+  [3]  View Available Books (Stock > 0)
+  [4]  View Complete Book Catalog
+  [5]  View Overdue Loans & Accrued Fines
+  [6]  View Individual Student Borrowing History
+  [7]  View Registered Student Members
+  [8]  Register New Student Member
+  [9]  Add New Book to Inventory
+  [10] Run Automated System Demonstration (Self-Test)
+  [0]  Exit Application
+------------------------------------------------------------------------------------------
+Enter your choice [0-10]: 3
+
+==========================================================================================
+   AVAILABLE BOOKS REPORT (COPIES > 0)
+==========================================================================================
+ID     | ISBN             | Title                                      | Category           | Copies  
+------------------------------------------------------------------------------------------
+1      | 978-0078022159   | Database System Concepts (7th Ed)          | Database Systems   | 5/6
+2      | 978-1260440232   | Java: The Complete Reference (12th Ed)     | Java & OOP         | 6/8
+3      | 978-1491957661   | Python for Data Analysis (3rd Ed)          | Data Science & AI  | 4/7
+4      | 978-0078022128   | Software Engineering: A Practitioner Appr. | Software Engineeri | 4/5
+5      | 978-0262033848   | Introduction to Algorithms (CLRS 3rd Ed)   | Algorithms & Data  | 3/6
+6      | 978-0132126953   | Computer Networks (5th Ed)                 | Computer Networks  | 5/5
+7      | 978-0134685991   | Effective Java (3rd Ed)                    | Java & OOP         | 3/4
+8      | 978-0136042594   | Artificial Intelligence: A Modern Approach | Data Science & AI  | 1/4
+9      | 978-9351341772   | Programming with Java                      | Java & OOP         | 6/7
+10     | 978-0132350884   | Clean Code: A Handbook of Agile Craftsmans | Software Engineeri | 3/5
+11     | 978-0073383095   | Discrete Mathematics and Its Applications  | Mathematics for Co | 5/6
+12     | 978-0321127426   | Patterns of Enterprise Application Archite | Software Engineeri | 4/4
+13     | 978-1449369415   | Hands-On Machine Learning with Scikit-Lear | Data Science & AI  | 2/5
+14     | 978-0596009205   | Head First Design Patterns                 | Java & OOP         | 4/6
+15     | 978-1492040767   | Kubernetes: Up and Running                 | Cloud & DevOps     | 4/4
+------------------------------------------------------------------------------------------
+Total Available Titles: 15
+
+Press [Enter] to return to the main menu...
+
+==========================================================================================
+   MAIN NAVIGATION MENU
+==========================================================================================
+  [1]  Issue Book to Student
+  [2]  Return Book & Calculate Overdue Fine
+...
+Enter your choice [0-10]: 1
+
+==========================================================================================
+   BOOK ISSUE PORTAL
+==========================================================================================
+Enter Student ID (or Register No): 1
+Enter Book ID to Issue: 2
+Enter Issue Date (YYYY-MM-DD) [Press Enter for Today: 2026-11-19]: 2026-11-19
+[SUCCESS] Book Issued Successfully!
+------------------------------------------------------------------------------------------
+  Transaction ID : #39
+  Borrower Name  : Abishek (732925ITR004)
+  Book Title     : Java: The Complete Reference (12th Ed)
+  Issue Date     : 2026-11-19
+  Due Date       : 2026-12-03 (14-day loan period)
+  Fine Rule      : ₹2.00 / day if returned after due date
+------------------------------------------------------------------------------------------
+
+Press [Enter] to return to the main menu...
+
+==========================================================================================
+   MAIN NAVIGATION MENU
+==========================================================================================
+Enter your choice [0-10]: 5
+Enter Reference Date (YYYY-MM-DD) [Press Enter for Today: 2026-11-19]: 2026-11-19
+
+==========================================================================================
+   OVERDUE BORROWING RECORDS (REFERENCE DATE: 2026-11-19)
+==========================================================================================
+TX ID  | Reg No         | Student Name       | Book Title                       | Due Date    | Overdue  | Fine (₹) 
+------------------------------------------------------------------------------------------
+34     | 732925ITR004   | Abishek            | Introduction to Algorithms (CLR. | 2026-11-15  | 4        | ₹8.00    
+35     | 732925ITR034   | Kavya M            | Artificial Intelligence: A Mode. | 2026-11-16  | 3        | ₹6.00    
+------------------------------------------------------------------------------------------
+Total Overdue Loans: 2 | Total Estimated Fine Payable: ₹14.00
+
+Press [Enter] to return to the main menu...
+
+==========================================================================================
+   MAIN NAVIGATION MENU
+==========================================================================================
+Enter your choice [0-10]: 6
+Enter Student ID (or Register No): 732925ITR004
+
+==========================================================================================
+   BORROWING HISTORY FOR: Abishek (732925ITR004)
+==========================================================================================
+Department: Information Technology | Year: 3 | Email: abishek.25it@vcet.ac.in
+------------------------------------------------------------------------------------------
+TX ID  | Book Title                         | Issue Date  | Due Date    | Return Date | Status    | Fine (₹)
+------------------------------------------------------------------------------------------
+39     | Java: The Complete Reference (12t. | 2026-11-19  | 2026-12-03  | ACTIVE      | ISSUED    | ₹0.00   
+34     | Introduction to Algorithms (CLRS . | 2026-11-01  | 2026-11-15  | ACTIVE      | ISSUED    | ₹0.00   
+28     | Head First Design Patterns         | 2026-09-12  | 2026-09-26  | 2026-09-25  | RETURNED  | ₹0.00   
+20     | Python for Data Analysis (3rd Ed)  | 2026-06-20  | 2026-07-04  | 2026-07-02  | RETURNED  | ₹0.00   
+12     | Introduction to Algorithms (CLRS . | 2026-04-04  | 2026-04-18  | 2026-04-17  | RETURNED  | ₹0.00   
+6      | Effective Java (3rd Ed)            | 2026-02-10  | 2026-02-24  | 2026-02-22  | RETURNED  | ₹0.00   
+1      | Database System Concepts (7th Ed)  | 2026-01-05  | 2026-01-19  | 2026-01-18  | RETURNED  | ₹0.00   
+------------------------------------------------------------------------------------------
+
+Press [Enter] to return to the main menu...
+
+==========================================================================================
+   MAIN NAVIGATION MENU
+==========================================================================================
+Enter your choice [0-10]: 2
+
+==========================================================================================
+   BOOK RETURN PORTAL
+==========================================================================================
+Enter Transaction ID to Return: 34
+Enter Return Date (YYYY-MM-DD) [Press Enter for Today: 2026-11-19]: 2026-11-20
+[SUCCESS] Book Returned Successfully!
+------------------------------------------------------------------------------------------
+  Transaction ID : #34
+  Book Title     : Introduction to Algorithms (CLRS 3rd Ed)
+  Issue Date     : 2026-11-01
+  Due Date       : 2026-11-15
+  Return Date    : 2026-11-20
+  Overdue Days   : 5 days
+  Fine Amount    : ₹10.00 (Rate: ₹2.00/day)
+[WARNING] Please collect fine of ₹10.00 from the student.
+------------------------------------------------------------------------------------------
+
+Press [Enter] to return to the main menu...
+
+==========================================================================================
+   MAIN NAVIGATION MENU
+==========================================================================================
+Enter your choice [0-10]: 10
+
+==========================================================================================
+   AUTOMATED SYSTEM DEMONSTRATION & BUSINESS LOGIC VERIFICATION
+==========================================================================================
+
+[STEP 1] Displaying Available Books in Catalog:
+...
+[STEP 2] Simulating Issue of Book ID: 1 to Student ID: 1 (Abishek):
+[SUCCESS] Demonstration Issue Succeeded! Transaction #40
+
+[STEP 3] Testing Constraint: Preventing Out-of-Stock Issuance:
+[SUCCESS] PASSED: Caught expected BookUnavailableException -> Book [ID: 8, Title: 'Artificial Intelligence: A Modern Approach'] is currently UNAVAILABLE (0 copies in stock).
+
+[STEP 4] Testing Fine Calculation Logic (14 days loan period, ₹2.00/day fine):
+  Due Date: 2026-10-01 | Return Date: 2026-09-28 (Early) -> Fine: ₹0.00 (Expected: ₹0.00) -> PASS
+  Due Date: 2026-10-01 | Return Date: 2026-10-06 (5 Days Late) -> Fine: ₹10.00 (Expected: ₹10.00) -> PASS
+
+[STEP 5] Displaying Overdue Loans Report:
+...
+[SUCCESS] All automated verification steps completed successfully!
+
+Press [Enter] to return to the main menu...
+
+==========================================================================================
+   MAIN NAVIGATION MENU
+==========================================================================================
+Enter your choice [0-10]: 0
+
+==========================================================================================
+   THANK YOU FOR USING THE LIBRARY CIRCULATION SYSTEM!
+==========================================================================================
+Developed by Abishek (732925ITR004), Dept of IT, VCET Erode.
